@@ -1,5 +1,6 @@
-@import 'tailwindcss';
+﻿@import 'tailwindcss';
 @import '../../vendor/livewire/flux/dist/flux.css';
+@import 'bootstrap-icons/font/bootstrap-icons.css';
 
 @source '../views';
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
@@ -64,3 +65,4 @@ select:focus[data-flux-control] {
 /* \[:where(&)\]:size-4 {
     @apply size-4;
 } */
+

@@ -1,8 +1,8 @@
 <?php
 
 use App\Concerns\ProfileValidationRules;
-use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Flux\Flux;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Title;
@@ -13,51 +13,58 @@ new #[Title('Profile settings')] class extends Component {
 
     public string $name = '';
     public string $email = '';
+    public string $phoneCode = '';
+    public string $phone = '';
+    public string $billingReference = '';
+    public string $language = 'en';
 
-    /**
-     * Mount the component.
-     */
     public function mount(): void
     {
-        $this->name = Auth::user()->name;
-        $this->email = Auth::user()->email;
+        $user = Auth::user();
+        $this->name             = $user->name;
+        $this->email            = $user->email;
+        $this->phoneCode        = $user->phone_code ?? '';
+        $this->phone            = $user->phone ?? '';
+        $this->billingReference = $user->billing_reference ?? '';
+        $this->language         = $user->language ?? 'en';
     }
 
-    /**
-     * Update the profile information for the currently authenticated user.
-     */
-    public function updateProfileInformation(): void
+    public function updated(string $property): void
     {
         $user = Auth::user();
 
-        $validated = $this->validate($this->profileRules($user->id));
+        $map = [
+            'name'             => 'name',
+            'email'            => 'email',
+            'phoneCode'        => 'phone_code',
+            'phone'            => 'phone',
+            'billingReference' => 'billing_reference',
+            'language'         => 'language',
+        ];
 
-        $user->fill($validated);
+        if (! isset($map[$property])) {
+            return;
+        }
 
-        if ($user->isDirty('email')) {
+        $this->validateOnly($property, $this->profileRules($user->id));
+
+        if ($property === 'email' && $user->email !== $this->email) {
             $user->email_verified_at = null;
         }
 
-        $user->save();
-
-        Flux::toast(variant: 'success', text: __('Profile updated.'));
+        $user->update([$map[$property] => $this->$property]);
     }
 
-    /**
-     * Send an email verification notification to the current user.
-     */
     public function resendVerificationNotification(): void
     {
         $user = Auth::user();
 
         if ($user->hasVerifiedEmail()) {
-            $this->redirectIntended(default: route('dashboard', absolute: false));
-
+            $this->redirectIntended(default: route('home', absolute: false));
             return;
         }
 
         $user->sendEmailVerificationNotification();
-
         Flux::toast(text: __('A new verification link has been sent to your email address.'));
     }
 
@@ -78,35 +85,35 @@ new #[Title('Profile settings')] class extends Component {
 <section class="w-full">
     @include('partials.settings-heading')
 
-    <flux:heading class="sr-only">{{ __('Profile settings') }}</flux:heading>
-
-    <x-pages::settings.layout :heading="__('Profile')" :subheading="__('Update your name and email address')">
-        <form wire:submit="updateProfileInformation" class="my-6 w-full space-y-6">
-            <flux:input wire:model="name" :label="__('Name')" type="text" required autofocus autocomplete="name" />
+    <x-pages::settings.layout :heading="__('Profile')" :subheading="__('Changes save automatically')">
+        <div class="my-6 w-full space-y-6">
+            <flux:input wire:model.live.debounce.600ms="name" :label="__('Name')" type="text" required autofocus autocomplete="name" />
 
             <div>
-                <flux:input wire:model="email" :label="__('Email')" type="email" required autocomplete="email" />
-
+                <flux:input wire:model.live.debounce.600ms="email" :label="__('Email')" type="email" required autocomplete="email" />
                 @if ($this->hasUnverifiedEmail)
-                    <div>
-                        <flux:text class="mt-4">
-                            {{ __('Your email address is unverified.') }}
-
-                            <flux:link class="text-sm cursor-pointer" wire:click.prevent="resendVerificationNotification">
-                                {{ __('Click here to re-send the verification email.') }}
-                            </flux:link>
-                        </flux:text>
-
-                    </div>
+                    <flux:text class="mt-4">
+                        {{ __('Your email address is unverified.') }}
+                        <flux:link class="cursor-pointer text-sm" wire:click.prevent="resendVerificationNotification">
+                            {{ __('Click here to re-send the verification email.') }}
+                        </flux:link>
+                    </flux:text>
                 @endif
             </div>
 
-            <div class="flex items-center gap-4">
-                <flux:button variant="primary" type="submit" data-test="update-profile-button">
-                    {{ __('Save') }}
-                </flux:button>
+            <div class="flex gap-3">
+                <flux:input wire:model.live.debounce.600ms="phoneCode" :label="__('Code')" class="w-24" />
+                <flux:input wire:model.live.debounce.600ms="phone" :label="__('Phone')" class="flex-1" />
             </div>
-        </form>
+
+            <flux:input wire:model.live.debounce.600ms="billingReference" :label="__('Billing reference')" />
+
+            <flux:select wire:model.live="language" :label="__('Language')">
+                <option value="en">English</option>
+                <option value="no">Norsk</option>
+                <option value="da">Dansk</option>
+            </flux:select>
+        </div>
 
         @if ($this->showDeleteUser)
             <livewire:pages::settings.delete-user-form />
