@@ -1,10 +1,17 @@
-<x-layouts::app :title="__('Activity Log')">
+<div>
     <div class="flex h-full flex-1 flex-col gap-6 p-6">
-        <flux:heading size="xl">{{ __('Activity Log') }}</flux:heading>
+        <h1 class="text-2xl font-bold">{{ __('Activity Log') }}</h1>
 
         <div class="flex gap-3">
-            <flux:input wire:model.live.debounce.300ms="search" icon="magnifying-glass" :placeholder="__('Search descriptions…')" clearable class="flex-1" />
-            <flux:input wire:model.live="filterSubject" :placeholder="__('Filter by model…')" clearable class="w-48" />
+            <div class="relative flex-1">
+                <i class="bi bi-search absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400 pointer-events-none"></i>
+                <input type="text" wire:model.live.debounce.300ms="search"
+                       class="input input-bordered w-full pl-9"
+                       placeholder="{{ __('Search descriptions…') }}" />
+            </div>
+            <input type="text" wire:model.live="filterSubject"
+                   class="input input-bordered w-48"
+                   placeholder="{{ __('Filter by model…') }}" />
         </div>
 
         <div class="overflow-hidden rounded-xl border border-zinc-200 dark:border-zinc-700">
@@ -48,4 +55,4 @@
             <div class="border-t border-zinc-100 px-4 py-3 dark:border-zinc-700">{{ $this->logs->links() }}</div>
         </div>
     </div>
-</x-layouts::app>
+</div>

@@ -4,81 +4,97 @@
         @include('partials.head')
     </head>
     <body class="min-h-screen bg-white dark:bg-zinc-800">
-        <flux:header container class="border-b border-zinc-200 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900">
-            <flux:sidebar.toggle class="lg:hidden mr-2" icon="bars-2" inset="left" />
+        {{-- Top navbar --}}
+        <header class="navbar border-b border-zinc-200 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900 px-4">
+            {{-- Mobile sidebar toggle --}}
+            <label for="mobile-sidebar" class="btn btn-ghost btn-sm lg:hidden mr-2">
+                <i class="bi bi-list text-xl"></i>
+            </label>
 
-            <x-app-logo href="{{ route('dashboard') }}" wire:navigate />
+            <x-app-logo href="{{ route('home') }}" wire:navigate />
 
-            <flux:navbar class="-mb-px max-lg:hidden">
-                <flux:navbar.item icon="layout-grid" :href="route('dashboard')" :current="request()->routeIs('dashboard')" wire:navigate>
-                    {{ __('Dashboard') }}
-                </flux:navbar.item>
-            </flux:navbar>
+            {{-- Desktop nav links --}}
+            <nav class="hidden lg:flex items-center gap-1 ml-4">
+                <a href="{{ route('home') }}" wire:navigate
+                   class="btn btn-ghost btn-sm {{ request()->routeIs('home') ? 'btn-active' : '' }}">
+                    <i class="bi bi-grid"></i> {{ __('home') }}
+                </a>
+            </nav>
 
-            <flux:spacer />
+            <div class="flex-1"></div>
 
-            <flux:navbar class="me-1.5 space-x-0.5 rtl:space-x-reverse py-0!">
-                <flux:tooltip :content="__('Search')" position="bottom">
-                    <flux:navbar.item class="!h-10 [&>div>svg]:size-5" icon="magnifying-glass" href="#" :label="__('Search')" />
-                </flux:tooltip>
-                <flux:tooltip :content="__('Repository')" position="bottom">
-                    <flux:navbar.item
-                        class="h-10 max-lg:hidden [&>div>svg]:size-5"
-                        icon="folder-git-2"
-                        href="https://github.com/laravel/livewire-starter-kit"
-                        target="_blank"
-                        :label="__('Repository')"
-                    />
-                </flux:tooltip>
-                <flux:tooltip :content="__('Documentation')" position="bottom">
-                    <flux:navbar.item
-                        class="h-10 max-lg:hidden [&>div>svg]:size-5"
-                        icon="book-open-text"
-                        href="https://laravel.com/docs/starter-kits#livewire"
-                        target="_blank"
-                        :label="__('Documentation')"
-                    />
-                </flux:tooltip>
-            </flux:navbar>
+            {{-- Right navbar actions --}}
+            <div class="flex items-center gap-1">
+                <div class="tooltip tooltip-bottom" data-tip="{{ __('Search') }}">
+                    <a href="#" class="btn btn-ghost btn-sm">
+                        <i class="bi bi-search text-base"></i>
+                    </a>
+                </div>
+                <div class="tooltip tooltip-bottom hidden lg:block" data-tip="{{ __('Repository') }}">
+                    <a href="https://github.com/laravel/livewire-starter-kit" target="_blank" class="btn btn-ghost btn-sm">
+                        <i class="bi bi-git text-base"></i>
+                    </a>
+                </div>
+                <div class="tooltip tooltip-bottom hidden lg:block" data-tip="{{ __('Documentation') }}">
+                    <a href="https://laravel.com/docs/starter-kits#livewire" target="_blank" class="btn btn-ghost btn-sm">
+                        <i class="bi bi-book text-base"></i>
+                    </a>
+                </div>
 
-            <x-desktop-user-menu />
-        </flux:header>
+                <x-desktop-user-menu />
+            </div>
+        </header>
 
-        <!-- Mobile Menu -->
-        <flux:sidebar collapsible="mobile" sticky class="lg:hidden border-e border-zinc-200 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900">
-            <flux:sidebar.header>
-                <x-app-logo :sidebar="true" href="{{ route('dashboard') }}" wire:navigate />
-                <flux:sidebar.collapse class="in-data-flux-sidebar-on-desktop:not-in-data-flux-sidebar-collapsed-desktop:-mr-2" />
-            </flux:sidebar.header>
-
-            <flux:sidebar.nav>
-                <flux:sidebar.group :heading="__('Platform')">
-                    <flux:sidebar.item icon="layout-grid" :href="route('dashboard')" :current="request()->routeIs('dashboard')" wire:navigate>
-                        {{ __('Dashboard')  }}
-                    </flux:sidebar.item>
-                </flux:sidebar.group>
-            </flux:sidebar.nav>
-
-            <flux:spacer />
-
-            <flux:sidebar.nav>
-                <flux:sidebar.item icon="folder-git-2" href="https://github.com/laravel/livewire-starter-kit" target="_blank">
-                    {{ __('Repository') }}
-                </flux:sidebar.item>
-                <flux:sidebar.item icon="book-open-text" href="https://laravel.com/docs/starter-kits#livewire" target="_blank">
-                    {{ __('Documentation') }}
-                </flux:sidebar.item>
-            </flux:sidebar.nav>
-        </flux:sidebar>
+        {{-- Mobile sidebar --}}
+        <div class="drawer lg:hidden">
+            <input id="mobile-sidebar" type="checkbox" class="drawer-toggle" />
+            <div class="drawer-side z-40">
+                <label for="mobile-sidebar" aria-label="close sidebar" class="drawer-overlay"></label>
+                <aside class="flex flex-col min-h-full w-72 bg-zinc-50 border-e border-zinc-200 dark:bg-zinc-900 dark:border-zinc-700 p-4">
+                    <x-app-logo :sidebar="true" href="{{ route('home') }}" wire:navigate class="mb-4" />
+                    <ul class="menu menu-sm p-0 gap-0.5">
+                        <li>
+                            <a href="{{ route('home') }}" wire:navigate class="{{ request()->routeIs('home') ? 'active' : '' }}">
+                                <i class="bi bi-grid"></i> {{ __('home') }}
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://github.com/laravel/livewire-starter-kit" target="_blank">
+                                <i class="bi bi-git"></i> {{ __('Repository') }}
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://laravel.com/docs/starter-kits#livewire" target="_blank">
+                                <i class="bi bi-book"></i> {{ __('Documentation') }}
+                            </a>
+                        </li>
+                    </ul>
+                </aside>
+            </div>
+        </div>
 
         {{ $slot }}
 
-        @persist('toast')
-            <flux:toast.group>
-                <flux:toast />
-            </flux:toast.group>
-        @endpersist
-
-        @fluxScripts
+        {{-- Toast notifications --}}
+        <div
+            x-data="{ toasts: [] }"
+            @notify.window="
+                const t = { id: Date.now(), text: $event.detail.text, variant: $event.detail.variant || 'info' };
+                toasts.push(t);
+                setTimeout(() => toasts = toasts.filter(x => x.id !== t.id), 4000);
+            "
+            class="toast toast-top toast-end z-50"
+        >
+            <template x-for="t in toasts" :key="t.id">
+                <div class="alert shadow-lg" :class="{
+                    'alert-success': t.variant === 'success',
+                    'alert-error': t.variant === 'danger' || t.variant === 'error',
+                    'alert-warning': t.variant === 'warning',
+                    'alert-info': t.variant === 'info'
+                }">
+                    <span x-text="t.text"></span>
+                </div>
+            </template>
+        </div>
     </body>
 </html>

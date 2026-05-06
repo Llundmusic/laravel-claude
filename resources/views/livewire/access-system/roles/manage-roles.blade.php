@@ -1,11 +1,18 @@
-<x-layouts::app :title="__('Manage Roles')">
+<div>
     <div class="flex h-full flex-1 flex-col gap-6 p-6">
         <div class="flex items-center justify-between">
-            <flux:heading size="xl">{{ __('Roles') }}</flux:heading>
-            <flux:button variant="primary" icon="plus" wire:click="$set('showCreateModal', true)">{{ __('New Role') }}</flux:button>
+            <h1 class="text-2xl font-bold">{{ __('Roles') }}</h1>
+            <button class="btn btn-primary" wire:click="$set('showCreateModal', true)">
+                <i class="bi bi-plus"></i> {{ __('New Role') }}
+            </button>
         </div>
 
-        <flux:input wire:model.live.debounce.300ms="search" icon="magnifying-glass" :placeholder="__('Search roles…')" clearable />
+        <div class="relative">
+            <i class="bi bi-search absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400 pointer-events-none"></i>
+            <input type="text" wire:model.live.debounce.300ms="search"
+                   class="input input-bordered w-full pl-9"
+                   placeholder="{{ __('Search roles…') }}" />
+        </div>
 
         <div class="overflow-hidden rounded-xl border border-zinc-200 dark:border-zinc-700">
             <table class="w-full text-sm">
@@ -23,21 +30,24 @@
                     <tr class="transition hover:bg-zinc-50 dark:hover:bg-zinc-800">
                         @if($editingRoleId === $role->id)
                         <td class="px-4 py-2">
-                            <flux:input wire:model="editFields.name" size="sm" />
+                            <input type="text" wire:model="editFields.name" class="input input-bordered input-sm w-full" />
                         </td>
                         <td class="px-4 py-2">
-                            <flux:input wire:model="editFields.description" size="sm" />
+                            <input type="text" wire:model="editFields.description" class="input input-bordered input-sm w-full" />
                         </td>
                         <td class="px-4 py-2">
-                            <flux:checkbox wire:model="editFields.can_be_approver" />
+                            <input type="checkbox" wire:model="editFields.can_be_approver" class="checkbox checkbox-sm" />
                         </td>
                         <td class="px-4 py-2">
-                            <flux:checkbox wire:model="editFields.is_active" :label="__('Active')" />
+                            <label class="label cursor-pointer gap-2 justify-start">
+                                <input type="checkbox" wire:model="editFields.is_active" class="checkbox checkbox-sm" />
+                                <span class="label-text">{{ __('Active') }}</span>
+                            </label>
                         </td>
                         <td class="px-4 py-2 text-end">
                             <div class="flex justify-end gap-2">
-                                <flux:button size="sm" variant="primary" wire:click="saveEdit">{{ __('Save') }}</flux:button>
-                                <flux:button size="sm" variant="ghost" wire:click="cancelEdit">{{ __('Cancel') }}</flux:button>
+                                <button class="btn btn-primary btn-sm" wire:click="saveEdit">{{ __('Save') }}</button>
+                                <button class="btn btn-ghost btn-sm" wire:click="cancelEdit">{{ __('Cancel') }}</button>
                             </div>
                         </td>
                         @else
@@ -49,25 +59,33 @@
                             @endif
                         </td>
                         <td class="px-4 py-3">
-                            <flux:badge :variant="$role->is_active ? 'success' : 'danger'">
+                            <span class="badge {{ $role->is_active ? 'badge-success' : 'badge-error' }}">
                                 {{ $role->is_active ? __('Active') : __('Inactive') }}
-                            </flux:badge>
+                            </span>
                         </td>
                         <td class="px-4 py-3 text-end">
-                            <flux:dropdown>
-                                <flux:button icon="ellipsis-horizontal" variant="ghost" size="sm" />
-                                <flux:menu>
-                                    <flux:menu.item icon="pencil" wire:click="startEdit({{ $role->id }})">{{ __('Edit') }}</flux:menu.item>
+                            <div class="dropdown dropdown-bottom dropdown-end">
+                                <div tabindex="0" role="button" class="btn btn-ghost btn-sm">
+                                    <i class="bi bi-three-dots"></i>
+                                </div>
+                                <ul tabindex="0" class="dropdown-content menu bg-white dark:bg-zinc-800 rounded-box z-10 w-40 p-2 shadow-lg border border-zinc-200 dark:border-zinc-700">
+                                    <li>
+                                        <button wire:click="startEdit({{ $role->id }})">
+                                            <i class="bi bi-pencil"></i> {{ __('Edit') }}
+                                        </button>
+                                    </li>
                                     @if(! $role->is_system_role)
-                                    <flux:menu.separator />
-                                    <flux:menu.item icon="trash" variant="danger"
-                                        wire:click="deleteRole({{ $role->id }})"
-                                        wire:confirm="{{ __('Delete this role?') }}">
-                                        {{ __('Delete') }}
-                                    </flux:menu.item>
+                                    <li><hr class="my-1 border-zinc-200 dark:border-zinc-700"></li>
+                                    <li>
+                                        <button class="text-error"
+                                            wire:click="deleteRole({{ $role->id }})"
+                                            wire:confirm="{{ __('Delete this role?') }}">
+                                            <i class="bi bi-trash"></i> {{ __('Delete') }}
+                                        </button>
+                                    </li>
                                     @endif
-                                </flux:menu>
-                            </flux:dropdown>
+                                </ul>
+                            </div>
                         </td>
                         @endif
                     </tr>
@@ -80,17 +98,32 @@
         </div>
     </div>
 
-    <flux:modal wire:model="showCreateModal" class="w-full max-w-md">
-        <flux:modal.header>{{ __('New Role') }}</flux:modal.header>
-        <flux:modal.body class="flex flex-col gap-4">
-            <flux:input wire:model="newName" :label="__('Name')" required />
-            <flux:input wire:model="newDescription" :label="__('Description')" />
-            <flux:checkbox wire:model="newCanBeApprover" :label="__('Can be approver')" />
-            <flux:checkbox wire:model="newIsSystemRole" :label="__('System role')" />
-        </flux:modal.body>
-        <flux:modal.footer class="flex justify-end gap-3">
-            <flux:button wire:click="$set('showCreateModal', false)" variant="ghost">{{ __('Cancel') }}</flux:button>
-            <flux:button wire:click="createRole" variant="primary">{{ __('Create') }}</flux:button>
-        </flux:modal.footer>
-    </flux:modal>
-</x-layouts::app>
+    <dialog x-data x-init="$watch('$wire.showCreateModal', v => { if(v) $el.showModal(); else $el.close(); })" @close="$wire.showCreateModal = false" class="modal">
+        <div class="modal-box w-full max-w-md">
+            <h3 class="font-bold text-lg mb-4">{{ __('New Role') }}</h3>
+            <div class="flex flex-col gap-4">
+                <div class="form-control w-full">
+                    <label class="label"><span class="label-text">{{ __('Name') }}</span></label>
+                    <input type="text" wire:model="newName" class="input input-bordered w-full" required />
+                    @error('newName') <span class="text-error text-xs mt-1">{{ $message }}</span> @enderror
+                </div>
+                <div class="form-control w-full">
+                    <label class="label"><span class="label-text">{{ __('Description') }}</span></label>
+                    <input type="text" wire:model="newDescription" class="input input-bordered w-full" />
+                </div>
+                <label class="label cursor-pointer gap-2 justify-start">
+                    <input type="checkbox" wire:model="newCanBeApprover" class="checkbox checkbox-sm" />
+                    <span class="label-text">{{ __('Can be approver') }}</span>
+                </label>
+                <label class="label cursor-pointer gap-2 justify-start">
+                    <input type="checkbox" wire:model="newIsSystemRole" class="checkbox checkbox-sm" />
+                    <span class="label-text">{{ __('System role') }}</span>
+                </label>
+            </div>
+            <div class="modal-action">
+                <button class="btn btn-ghost" wire:click="$set('showCreateModal', false)">{{ __('Cancel') }}</button>
+                <button class="btn btn-primary" wire:click="createRole">{{ __('Create') }}</button>
+            </div>
+        </div>
+    </dialog>
+</div>

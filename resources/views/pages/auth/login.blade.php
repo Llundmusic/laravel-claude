@@ -9,50 +9,52 @@
             @csrf
 
             <!-- Email Address -->
-            <flux:input
-                name="email"
-                :label="__('Email address')"
-                :value="old('email')"
-                type="email"
-                required
-                autofocus
-                autocomplete="email"
-                placeholder="email@example.com"
-            />
+            <div class="form-control w-full">
+                <label class="label" for="email"><span class="label-text">{{ __('Email address') }}</span></label>
+                <input id="email" name="email" type="email" value="{{ old('email') }}"
+                       class="input input-bordered w-full" required autofocus autocomplete="email"
+                       placeholder="email@example.com" />
+                @error('email') <span class="text-error text-xs mt-1">{{ $message }}</span> @enderror
+            </div>
 
             <!-- Password -->
-            <div class="relative">
-                <flux:input
-                    name="password"
-                    :label="__('Password')"
-                    type="password"
-                    required
-                    autocomplete="current-password"
-                    :placeholder="__('Password')"
-                    viewable
-                />
-
-                @if (Route::has('password.request'))
-                    <flux:link class="absolute top-0 text-sm end-0" :href="route('password.request')" wire:navigate>
-                        {{ __('Forgot your password?') }}
-                    </flux:link>
-                @endif
+            <div class="form-control w-full" x-data="{ show: false }">
+                <div class="flex items-center justify-between">
+                    <label class="label" for="password"><span class="label-text">{{ __('Password') }}</span></label>
+                    @if (Route::has('password.request'))
+                        <a class="link link-hover text-sm" href="{{ route('password.request') }}" wire:navigate>
+                            {{ __('Forgot your password?') }}
+                        </a>
+                    @endif
+                </div>
+                <div class="relative">
+                    <input id="password" name="password" :type="show ? 'text' : 'password'"
+                           class="input input-bordered w-full pr-10" required autocomplete="current-password"
+                           :placeholder="show ? '' : '••••••••'" />
+                    <button type="button" @click="show = !show"
+                            class="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600">
+                        <i class="bi" :class="show ? 'bi-eye-slash' : 'bi-eye'"></i>
+                    </button>
+                </div>
+                @error('password') <span class="text-error text-xs mt-1">{{ $message }}</span> @enderror
             </div>
 
             <!-- Remember Me -->
-            <flux:checkbox name="remember" :label="__('Remember me')" :checked="old('remember')" />
+            <label class="label cursor-pointer gap-2 justify-start">
+                <input type="checkbox" name="remember" class="checkbox checkbox-sm"
+                       {{ old('remember') ? 'checked' : '' }} />
+                <span class="label-text">{{ __('Remember me') }}</span>
+            </label>
 
-            <div class="flex items-center justify-end">
-                <flux:button variant="primary" type="submit" class="w-full" data-test="login-button">
-                    {{ __('Log in') }}
-                </flux:button>
-            </div>
+            <button type="submit" class="btn btn-primary w-full" data-test="login-button">
+                {{ __('Log in') }}
+            </button>
         </form>
 
         @if (Route::has('register'))
             <div class="space-x-1 text-sm text-center rtl:space-x-reverse text-zinc-600 dark:text-zinc-400">
                 <span>{{ __('Don\'t have an account?') }}</span>
-                <flux:link :href="route('register')" wire:navigate>{{ __('Sign up') }}</flux:link>
+                <a href="{{ route('register') }}" wire:navigate class="link link-hover">{{ __('Sign up') }}</a>
             </div>
         @endif
     </div>

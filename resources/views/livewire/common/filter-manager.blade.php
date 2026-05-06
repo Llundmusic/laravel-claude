@@ -1,4 +1,4 @@
-<x-layouts::app :title="__('Saved Filters')">
+<div>
     <div
         class="flex h-full flex-1 flex-col gap-6 p-6"
         x-data="{
@@ -15,8 +15,10 @@
         }"
     >
         <div class="flex items-center justify-between">
-            <flux:heading size="xl">{{ __('Saved Filters') }}</flux:heading>
-            <flux:button variant="primary" icon="plus" wire:click="$set('showCreateModal', true)">{{ __('New Filter') }}</flux:button>
+            <h1 class="text-2xl font-bold">{{ __('Saved Filters') }}</h1>
+            <button class="btn btn-primary" wire:click="$set('showCreateModal', true)">
+                <i class="bi bi-plus"></i> {{ __('New Filter') }}
+            </button>
         </div>
 
         @if($this->filters->isEmpty())
@@ -27,10 +29,7 @@
             </div>
         </div>
         @else
-        <div
-            x-init="initSortable($el)"
-            class="flex flex-col gap-2"
-        >
+        <div x-init="initSortable($el)" class="flex flex-col gap-2">
             @foreach($this->filters as $filter)
             <div
                 data-id="{{ $filter->id }}"
@@ -41,31 +40,42 @@
                     <div class="font-medium">{{ $filter->filter_name }}</div>
                     <div class="text-xs text-zinc-400">{{ $filter->page_name }}</div>
                 </div>
-                <flux:button
-                    icon="trash"
-                    variant="ghost"
-                    size="sm"
+                <button class="btn btn-ghost btn-sm"
                     wire:click="deleteFilter({{ $filter->id }})"
-                    wire:confirm="{{ __('Delete this filter?') }}"
-                />
+                    wire:confirm="{{ __('Delete this filter?') }}">
+                    <i class="bi bi-trash"></i>
+                </button>
             </div>
             @endforeach
         </div>
         @endif
     </div>
 
-    <flux:modal wire:model="showCreateModal" class="w-full max-w-md">
-        <flux:modal.header>{{ __('New Saved Filter') }}</flux:modal.header>
-        <flux:modal.body class="flex flex-col gap-4">
-            <flux:input wire:model="newPageName" :label="__('Page name')" placeholder="e.g. orders" required />
-            <flux:input wire:model="newFilterName" :label="__('Filter name')" required />
-            <flux:input wire:model="newFilterColumn" :label="__('Column (optional)')" />
-        </flux:modal.body>
-        <flux:modal.footer class="flex justify-end gap-3">
-            <flux:button wire:click="$set('showCreateModal', false)" variant="ghost">{{ __('Cancel') }}</flux:button>
-            <flux:button wire:click="createFilter" variant="primary">{{ __('Save') }}</flux:button>
-        </flux:modal.footer>
-    </flux:modal>
-
-</x-layouts::app>
-
+    {{-- Create modal --}}
+    <dialog x-data x-init="$watch('$wire.showCreateModal', v => { if(v) $el.showModal(); else $el.close(); })" @close="$wire.showCreateModal = false" class="modal">
+        <div class="modal-box w-full max-w-md">
+            <h3 class="font-bold text-lg mb-4">{{ __('New Saved Filter') }}</h3>
+            <div class="flex flex-col gap-4">
+                <div class="form-control w-full">
+                    <label class="label"><span class="label-text">{{ __('Page name') }}</span></label>
+                    <input type="text" wire:model="newPageName" class="input input-bordered w-full"
+                           placeholder="e.g. orders" required />
+                    @error('newPageName') <span class="text-error text-xs mt-1">{{ $message }}</span> @enderror
+                </div>
+                <div class="form-control w-full">
+                    <label class="label"><span class="label-text">{{ __('Filter name') }}</span></label>
+                    <input type="text" wire:model="newFilterName" class="input input-bordered w-full" required />
+                    @error('newFilterName') <span class="text-error text-xs mt-1">{{ $message }}</span> @enderror
+                </div>
+                <div class="form-control w-full">
+                    <label class="label"><span class="label-text">{{ __('Column (optional)') }}</span></label>
+                    <input type="text" wire:model="newFilterColumn" class="input input-bordered w-full" />
+                </div>
+            </div>
+            <div class="modal-action">
+                <button class="btn btn-ghost" wire:click="$set('showCreateModal', false)">{{ __('Cancel') }}</button>
+                <button class="btn btn-primary" wire:click="createFilter">{{ __('Save') }}</button>
+            </div>
+        </div>
+    </dialog>
+</div>

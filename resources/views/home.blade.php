@@ -1,10 +1,10 @@
 <x-layouts::app :title="__('Dashboard')">
     <div class="flex h-full flex-1 flex-col items-center justify-center gap-6 p-6">
         <div class="text-center">
-            <flux:heading size="xl">{{ __('Welcome') }}{{ auth()->check() ? ', ' . auth()->user()->name : '' }}</flux:heading>
+            <h1 class="text-2xl font-bold">{{ __('Welcome') }}{{ auth()->check() ? ', ' . auth()->user()->name : '' }}</h1>
             @auth
                 @if(auth()->user()->activeCompany)
-                <flux:text class="mt-2 text-zinc-500">{{ auth()->user()->activeCompany->name }}</flux:text>
+                <p class="mt-2 text-sm text-zinc-500">{{ auth()->user()->activeCompany->name }}</p>
                 @endif
             @endauth
         </div>

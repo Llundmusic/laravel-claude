@@ -10,19 +10,23 @@
         <form method="POST" action="{{ route('password.confirm.store') }}" class="flex flex-col gap-6">
             @csrf
 
-            <flux:input
-                name="password"
-                :label="__('Password')"
-                type="password"
-                required
-                autocomplete="current-password"
-                :placeholder="__('Password')"
-                viewable
-            />
+            <div class="form-control w-full" x-data="{ show: false }">
+                <label class="label" for="password"><span class="label-text">{{ __('Password') }}</span></label>
+                <div class="relative">
+                    <input id="password" name="password" :type="show ? 'text' : 'password'"
+                           class="input input-bordered w-full pr-10" required autocomplete="current-password"
+                           placeholder="{{ __('Password') }}" />
+                    <button type="button" @click="show = !show"
+                            class="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600">
+                        <i class="bi" :class="show ? 'bi-eye-slash' : 'bi-eye'"></i>
+                    </button>
+                </div>
+                @error('password') <span class="text-error text-xs mt-1">{{ $message }}</span> @enderror
+            </div>
 
-            <flux:button variant="primary" type="submit" class="w-full" data-test="confirm-password-button">
+            <button type="submit" class="btn btn-primary w-full" data-test="confirm-password-button">
                 {{ __('Confirm') }}
-            </flux:button>
+            </button>
         </form>
     </div>
 </x-layouts::auth>

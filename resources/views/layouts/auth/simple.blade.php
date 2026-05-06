@@ -18,12 +18,25 @@
             </div>
         </div>
 
-        @persist('toast')
-            <flux:toast.group>
-                <flux:toast />
-            </flux:toast.group>
-        @endpersist
-
-        @fluxScripts
+        {{-- Toast notifications --}}
+        <div
+            x-data="{ toasts: [] }"
+            @notify.window="
+                const t = { id: Date.now(), text: $event.detail.text, variant: $event.detail.variant || 'info' };
+                toasts.push(t);
+                setTimeout(() => toasts = toasts.filter(x => x.id !== t.id), 4000);
+            "
+            class="toast toast-top toast-end z-50"
+        >
+            <template x-for="t in toasts" :key="t.id">
+                <div class="alert shadow-lg" :class="{
+                    'alert-success': t.variant === 'success',
+                    'alert-error': t.variant === 'danger' || t.variant === 'error',
+                    'alert-info': t.variant === 'info'
+                }">
+                    <span x-text="t.text"></span>
+                </div>
+            </template>
+        </div>
     </body>
 </html>

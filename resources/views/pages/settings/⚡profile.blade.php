@@ -1,7 +1,6 @@
 <?php
 
 use App\Concerns\ProfileValidationRules;
-use Flux\Flux;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Computed;
@@ -65,7 +64,7 @@ new #[Title('Profile settings')] class extends Component {
         }
 
         $user->sendEmailVerificationNotification();
-        Flux::toast(text: __('A new verification link has been sent to your email address.'));
+        $this->dispatch('notify', text: __('A new verification link has been sent to your email address.'), variant: 'success');
     }
 
     #[Computed]
@@ -87,32 +86,54 @@ new #[Title('Profile settings')] class extends Component {
 
     <x-pages::settings.layout :heading="__('Profile')" :subheading="__('Changes save automatically')">
         <div class="my-6 w-full space-y-6">
-            <flux:input wire:model.live.debounce.600ms="name" :label="__('Name')" type="text" required autofocus autocomplete="name" />
+            <div class="form-control w-full">
+                <label class="label"><span class="label-text">{{ __('Name') }}</span></label>
+                <input type="text" wire:model.live.debounce.600ms="name"
+                       class="input input-bordered w-full" required autofocus autocomplete="name" />
+                @error('name') <span class="text-error text-xs mt-1">{{ $message }}</span> @enderror
+            </div>
 
             <div>
-                <flux:input wire:model.live.debounce.600ms="email" :label="__('Email')" type="email" required autocomplete="email" />
+                <div class="form-control w-full">
+                    <label class="label"><span class="label-text">{{ __('Email') }}</span></label>
+                    <input type="email" wire:model.live.debounce.600ms="email"
+                           class="input input-bordered w-full" required autocomplete="email" />
+                    @error('email') <span class="text-error text-xs mt-1">{{ $message }}</span> @enderror
+                </div>
                 @if ($this->hasUnverifiedEmail)
-                    <flux:text class="mt-4">
+                    <p class="mt-4 text-sm">
                         {{ __('Your email address is unverified.') }}
-                        <flux:link class="cursor-pointer text-sm" wire:click.prevent="resendVerificationNotification">
+                        <button class="link link-hover text-sm cursor-pointer" wire:click.prevent="resendVerificationNotification">
                             {{ __('Click here to re-send the verification email.') }}
-                        </flux:link>
-                    </flux:text>
+                        </button>
+                    </p>
                 @endif
             </div>
 
             <div class="flex gap-3">
-                <flux:input wire:model.live.debounce.600ms="phoneCode" :label="__('Code')" class="w-24" />
-                <flux:input wire:model.live.debounce.600ms="phone" :label="__('Phone')" class="flex-1" />
+                <div class="form-control w-24">
+                    <label class="label"><span class="label-text">{{ __('Code') }}</span></label>
+                    <input type="text" wire:model.live.debounce.600ms="phoneCode" class="input input-bordered w-full" />
+                </div>
+                <div class="form-control flex-1">
+                    <label class="label"><span class="label-text">{{ __('Phone') }}</span></label>
+                    <input type="text" wire:model.live.debounce.600ms="phone" class="input input-bordered w-full" />
+                </div>
             </div>
 
-            <flux:input wire:model.live.debounce.600ms="billingReference" :label="__('Billing reference')" />
+            <div class="form-control w-full">
+                <label class="label"><span class="label-text">{{ __('Billing reference') }}</span></label>
+                <input type="text" wire:model.live.debounce.600ms="billingReference" class="input input-bordered w-full" />
+            </div>
 
-            <flux:select wire:model.live="language" :label="__('Language')">
-                <option value="en">English</option>
-                <option value="no">Norsk</option>
-                <option value="da">Dansk</option>
-            </flux:select>
+            <div class="form-control w-full">
+                <label class="label"><span class="label-text">{{ __('Language') }}</span></label>
+                <select wire:model.live="language" class="select select-bordered w-full">
+                    <option value="en">English</option>
+                    <option value="no">Norsk</option>
+                    <option value="da">Dansk</option>
+                </select>
+            </div>
         </div>
 
         @if ($this->showDeleteUser)
