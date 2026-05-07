@@ -56,12 +56,16 @@ class CompanyAdministration extends Component
 
     public string $newDeptName = '';
 
-    public function mount(Company $company): void
+    public function mount(): void
     {
+        $company = auth()->user()->activeCompany;
+
+        abort_unless($company, 404);
+
         $this->company = $company;
         $this->fill([
-            'name' => $company->name,
-            'slug' => $company->slug,
+            'name' => $company->name ?? '',
+            'slug' => $company->slug ?? '',
             'customerNumber' => $company->customer_number ?? '',
             'email' => $company->email ?? '',
             'phoneCode' => $company->phone_code ?? '',

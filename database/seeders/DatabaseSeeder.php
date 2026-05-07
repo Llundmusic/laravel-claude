@@ -20,6 +20,9 @@ class DatabaseSeeder extends Seeder
             CountrySeeder::class,
             // AccessGroupSeeder removed - rbac:sync handles access group discovery
             // UsersSeeder should be run separately after rbac:sync in deployment
+            FxRateSeeder::class,
+            GpBudgetSeeder::class,
+            DutySeeder::class,
         ]);
     }
 }

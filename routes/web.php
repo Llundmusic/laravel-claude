@@ -8,12 +8,14 @@ use App\Http\Livewire\AccessSystem\Roles\ManageRoles;
 use App\Http\Livewire\AccessSystem\Users\ManageUsers;
 use App\Http\Livewire\Admin\ActivityLog;
 use App\Http\Livewire\Common\FilterManager;
+use App\Http\Livewire\QuoteCalculations\QuoteCalculationEdit;
+use App\Http\Livewire\QuoteCalculations\QuoteCalculationIndex;
 use Illuminate\Support\Facades\Route;
 
-Route::view('/', 'home')->name('home');
 Route::view('/noaccess', 'noaccess')->name('noaccess');
 
 Route::middleware(['auth', 'verified'])->group(function () {
+    Route::view('/', 'home')->name('home');
     Route::get('/admin/users', ManageUsers::class)->name('admin.users');
     Route::get('/admin/companies', ManageCompanies::class)->name('admin.companies');
     Route::get('/company/administration', CompanyAdministration::class)->name('company.administration');
@@ -21,6 +23,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/admin/access-groups', ManageAccessGroups::class)->name('admin.access-groups');
     Route::get('/admin/activitylog', ActivityLog::class)->name('admin.activitylog');
     Route::get('/filters', FilterManager::class)->name('filters');
+
+    Route::get('/quote-calculations', QuoteCalculationIndex::class)->name('quote-calculations.index');
+    Route::get('/quote-calculations/{id}', QuoteCalculationEdit::class)->name('quote-calculations.edit');
 
     Route::post('/user/set-active-company', [CompanyController::class, 'setActiveCompany'])->name('user.set-active-company');
 });

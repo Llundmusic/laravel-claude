@@ -92,6 +92,12 @@
                                         <i class="bi bi-house"></i> {{ __('Dashboard') }}
                                     </a>
                                 </li>
+                                <li>
+                                    <a href="{{ route('quote-calculations.index') }}" wire:navigate
+                                       class="{{ request()->routeIs('quote-calculations.*') ? 'active' : '' }}">
+                                        <i class="bi bi-calculator"></i> {{ __('Quote Calculations') }}
+                                    </a>
+                                </li>
                             </ul>
                         </div>
 
@@ -99,14 +105,14 @@
                         <div class="mb-4">
                             <div class="px-2 py-1 text-xs font-medium text-zinc-400 uppercase tracking-wider">{{ __('Settings') }}</div>
                             <ul class="menu menu-sm p-0 gap-0.5">
-                                @can('view-company-admin')
+                                @if(app(\App\Services\AccessLevelService::class)->hasAccess('settings_company'))
                                 <li>
                                     <a href="{{ route('company.administration') }}" wire:navigate
                                        class="{{ request()->routeIs('company.administration') ? 'active' : '' }}">
                                         <i class="bi bi-building"></i> {{ __('Company') }}
                                     </a>
                                 </li>
-                                @endcan
+                                @endif
                                 <li>
                                     <a href="{{ route('filters') }}" wire:navigate
                                        class="{{ request()->routeIs('filters') ? 'active' : '' }}">
@@ -116,60 +122,60 @@
                             </ul>
                         </div>
 
-                        {{-- @if(app(\App\Services\AccessLevelService::class)->hasAccess('administration_users') ||
+                        @if(app(\App\Services\AccessLevelService::class)->hasAccess('administration_users') ||
                             app(\App\Services\AccessLevelService::class)->hasAccess('administration_roles') ||
                             app(\App\Services\AccessLevelService::class)->hasAccess('administration_access_groups') ||
-                            app(\App\Services\AccessLevelService::class)->hasAccess('administration_companies')) --}}
+                            app(\App\Services\AccessLevelService::class)->hasAccess('administration_companies'))
                         <div class="mb-4">
                             <div class="px-2 py-1 text-xs font-medium text-zinc-400 uppercase tracking-wider">{{ __('Administration') }}</div>
                             <ul class="menu menu-sm p-0 gap-0.5">
-                                {{-- @if(app(\App\Services\AccessLevelService::class)->hasAccess('administration_users')) --}}
+                                @if(app(\App\Services\AccessLevelService::class)->hasAccess('administration_users'))
                                 <li>
                                     <a href="{{ route('admin.users') }}" wire:navigate
                                        class="{{ request()->routeIs('admin.users') ? 'active' : '' }}">
                                         <i class="bi bi-people"></i> {{ __('Users') }}
                                     </a>
                                 </li>
-                                {{-- @endif --}}
+                                @endif
 
-                                {{-- @if(app(\App\Services\AccessLevelService::class)->hasAccess('administration_companies')) --}}
+                                @if(app(\App\Services\AccessLevelService::class)->hasAccess('administration_companies'))
                                 <li>
                                     <a href="{{ route('admin.companies') }}" wire:navigate
                                        class="{{ request()->routeIs('admin.companies') ? 'active' : '' }}">
                                         <i class="bi bi-shop"></i> {{ __('Companies') }}
                                     </a>
                                 </li>
-                                {{-- @endif --}}
+                                @endif
 
-                                {{-- @if(app(\App\Services\AccessLevelService::class)->hasAccess('administration_roles')) --}}
+                                @if(app(\App\Services\AccessLevelService::class)->hasAccess('administration_roles'))
                                 <li>
                                     <a href="{{ route('admin.roles') }}" wire:navigate
                                        class="{{ request()->routeIs('admin.roles') ? 'active' : '' }}">
                                         <i class="bi bi-shield-check"></i> {{ __('Roles') }}
                                     </a>
                                 </li>
-                                {{-- @endif --}}
+                                @endif
 
-                                {{-- @if(app(\App\Services\AccessLevelService::class)->hasAccess('administration_access_groups')) --}}
+                                @if(app(\App\Services\AccessLevelService::class)->hasAccess('administration_access_groups'))
                                 <li>
                                     <a href="{{ route('admin.access-groups') }}" wire:navigate
                                        class="{{ request()->routeIs('admin.access-groups') ? 'active' : '' }}">
                                         <i class="bi bi-key"></i> {{ __('Access Groups') }}
                                     </a>
                                 </li>
-                                {{-- @endif --}}
+                                @endif
 
-                                {{-- @if(app(\App\Services\AccessLevelService::class)->hasAccess('admin_activity_log')) --}}
+                                @if(app(\App\Services\AccessLevelService::class)->hasAccess('admin_activity_log'))
                                 <li>
                                     <a href="{{ route('admin.activitylog') }}" wire:navigate
                                        class="{{ request()->routeIs('admin.activitylog') ? 'active' : '' }}">
                                         <i class="bi bi-clipboard-data"></i> {{ __('Activity Log') }}
                                     </a>
                                 </li>
-                                {{-- @endif --}}
+                                @endif
                             </ul>
                         </div>
-                        {{-- @endif --}}
+                        @endif
                         @endauth
                     </nav>
 

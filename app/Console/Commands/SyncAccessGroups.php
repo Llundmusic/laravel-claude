@@ -7,21 +7,45 @@ use Illuminate\Console\Command;
 
 class SyncAccessGroups extends Command
 {
-    protected $signature = 'access:sync-groups {--groups=* : Group names to ensure exist}';
+    protected $signature = 'access:sync-groups {--dry-run : Preview discovered groups without making changes}';
 
-    protected $description = 'Ensure all defined access groups exist in the database';
+    protected $description = 'Auto-discover access groups from codebase and sync with database';
 
     public function handle(AccessGroupSyncService $service): void
     {
-        $groups = $this->option('groups');
+        if ($this->option('dry-run')) {
+            $results = $service->dryRunSync();
 
-        if (empty($groups)) {
-            $this->warn('No group names provided. Pass --groups=basic_access --groups=administration_users etc.');
+            $this->info("Discovered: {$results['discovered']} groups");
+            $this->newLine();
+
+            $this->info('New groups (would be created):');
+            foreach ($results['new_groups'] as $name) {
+                $this->line("  + {$name}");
+            }
+
+            $this->newLine();
+            $this->info('Existing groups:');
+            foreach ($results['existing_groups'] as $name) {
+                $this->line("  = {$name}");
+            }
+
+            $this->newLine();
+            $this->info('Potentially unused (would be deactivated):');
+            foreach ($results['potentially_unused'] as $name) {
+                $this->line("  - {$name}");
+            }
 
             return;
         }
 
-        $service->syncGroups($groups);
-        $this->info('Access groups synced: '.implode(', ', $groups));
+        $results = $service->syncAccessGroups();
+
+        $this->info('Sync complete.');
+        $this->line("  Discovered:        {$results['discovered']}");
+        $this->line("  New:               {$results['new']}");
+        $this->line("  Updated:           {$results['updated']}");
+        $this->line("  Deactivated:       {$results['deactivated']}");
+        $this->line("  Admin assignments: {$results['admin_assignments']}");
     }
 }
